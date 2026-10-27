@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.py[cod]
+
+# Virtuelno okruženje
+.venv/
+
+# Lokalna podešavanja
+.env
+
+# Baza i generisani podaci
+*.db
+backend/data/
+
+# Keš alata
+.pytest_cache/
+.ruff_cache/
+
+# Frontend (za kasnije)
+node_modules/
+
+# Editor / OS
+.idea/
+.DS_Store
+
+# Tekst zadatka (ne ide u repozitorijum)
+Backend Task.pdf

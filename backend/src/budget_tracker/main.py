@@ -3,7 +3,10 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 
+from budget_tracker.budgets.models import Budget  # noqa: F401
+from budget_tracker.categories.models import Category  # noqa: F401
 from budget_tracker.core.database import Base, engine
+from budget_tracker.transactions.models import Transaction  # noqa: F401
 
 
 @asynccontextmanager

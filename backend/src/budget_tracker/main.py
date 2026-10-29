@@ -6,6 +6,7 @@ from fastapi import FastAPI
 from budget_tracker.budgets.models import Budget  # noqa: F401
 from budget_tracker.categories.models import Category  # noqa: F401
 from budget_tracker.core.database import Base, engine
+from budget_tracker.core.exceptions import register_exception_handlers
 from budget_tracker.transactions.models import Transaction  # noqa: F401
 
 
@@ -16,6 +17,7 @@ async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
 
 
 app = FastAPI(title="Budget Tracker API", version="1.0.0", lifespan=lifespan)
+register_exception_handlers(app)
 
 
 @app.get("/health", tags=["health"])

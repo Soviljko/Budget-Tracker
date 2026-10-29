@@ -1,10 +1,36 @@
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from budget_tracker.categories.service import get_category
 from budget_tracker.core.exceptions import NotFoundError
 from budget_tracker.core.types import to_cents
 from budget_tracker.transactions.models import Transaction
-from budget_tracker.transactions.schemas import TransactionInput
+from budget_tracker.transactions.schemas import TransactionInput, TransactionQuery
+
+
+def list_transactions(db: Session, params: TransactionQuery) -> tuple[list[Transaction], int]:
+    query = select(Transaction)
+    if params.date_from is not None:
+        query = query.where(Transaction.date >= params.date_from)
+    if params.date_to is not None:
+        query = query.where(Transaction.date <= params.date_to)
+    if params.category_id is not None:
+        query = query.where(Transaction.category_id == params.category_id)
+    if params.type is not None:
+        query = query.where(Transaction.type == params.type)
+    if params.search:
+        query = query.where(
+            Transaction.description_normalized.contains(params.search.casefold(), autoescape=True)
+        )
+
+    total = db.scalar(select(func.count()).select_from(query.subquery())) or 0
+    items = db.scalars(
+        query.order_by(Transaction.date.desc(), Transaction.id.desc())
+        .limit(params.page_size)
+        .offset((params.page - 1) * params.page_size)
+    )
+
+    return list(items), total
 
 
 def get_transaction(db: Session, transaction_id: int) -> Transaction:

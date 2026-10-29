@@ -2,7 +2,7 @@ import datetime as dt
 from decimal import Decimal
 from typing import Self
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field, model_validator
 
 from budget_tracker.core.types import Amount, Description, from_cents
 from budget_tracker.transactions.models import Transaction, TransactionType
@@ -34,3 +34,26 @@ class TransactionRead(BaseModel):
             description=transaction.description,
             category_id=transaction.category_id,
         )
+
+
+class TransactionQuery(BaseModel):
+    date_from: dt.date | None = None
+    date_to: dt.date | None = None
+    category_id: int | None = None
+    type: TransactionType | None = None
+    search: str | None = None
+    page: int = Field(default=1, ge=1)
+    page_size: int = Field(default=20, ge=1, le=100)
+
+    @model_validator(mode="after")
+    def _check_date_range(self) -> Self:
+        if self.date_from and self.date_to and self.date_from > self.date_to:
+            raise ValueError("date_from must not be after date_to.")
+        return self
+
+
+class TransactionPage(BaseModel):
+    items: list[TransactionRead]
+    total: int
+    page: int
+    page_size: int

@@ -1,10 +1,30 @@
-from fastapi import APIRouter, status
+from typing import Annotated
+
+from fastapi import APIRouter, Query, status
 
 from budget_tracker.core.database import DbSession
 from budget_tracker.transactions import service
-from budget_tracker.transactions.schemas import TransactionInput, TransactionRead
+from budget_tracker.transactions.schemas import (
+    TransactionInput,
+    TransactionPage,
+    TransactionQuery,
+    TransactionRead,
+)
 
 router = APIRouter(prefix="/transactions", tags=["transactions"])
+
+
+@router.get("")
+def list_transactions(
+    params: Annotated[TransactionQuery, Query()], db: DbSession
+) -> TransactionPage:
+    items, total = service.list_transactions(db, params)
+    return TransactionPage(
+        items=[TransactionRead.from_model(t) for t in items],
+        total=total,
+        page=params.page,
+        page_size=params.page_size,
+    )
 
 
 @router.post("", status_code=status.HTTP_201_CREATED)

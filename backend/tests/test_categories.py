@@ -94,3 +94,15 @@ def test_delete_category(client: TestClient, create_category) -> None:
 
     assert response.status_code == 204
     assert client.get(f"/categories/{category['id']}").status_code == 404
+
+
+def test_category_with_transactions_cannot_be_deleted(
+    client: TestClient, create_category, create_transaction
+) -> None:
+    food = create_category(name="Food")
+    create_transaction(category_id=food["id"])
+
+    response = client.delete(f"/categories/{food['id']}")
+
+    assert response.status_code == 409
+    assert client.get(f"/categories/{food['id']}").status_code == 200

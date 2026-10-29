@@ -9,6 +9,7 @@ from budget_tracker.categories.models import Category  # noqa: F401
 from budget_tracker.categories.router import router as categories_router
 from budget_tracker.core.database import Base, engine
 from budget_tracker.core.exceptions import register_exception_handlers
+from budget_tracker.summary.router import router as summary_router
 from budget_tracker.transactions.models import Transaction  # noqa: F401
 from budget_tracker.transactions.router import router as transactions_router
 
@@ -26,6 +27,7 @@ register_exception_handlers(app)
 app.include_router(categories_router, prefix=API_PREFIX)
 app.include_router(transactions_router, prefix=API_PREFIX)
 app.include_router(budgets_router, prefix=API_PREFIX)
+app.include_router(summary_router, prefix=API_PREFIX)
 
 
 @app.get("/health", tags=["health"])

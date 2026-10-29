@@ -1,6 +1,7 @@
 from collections.abc import Iterator
-from typing import Any
+from typing import Annotated, Any
 
+from fastapi import Depends
 from sqlalchemy import Engine, create_engine, event
 from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
 
@@ -32,3 +33,6 @@ SessionLocal = sessionmaker(bind=engine, expire_on_commit=False)
 def get_db() -> Iterator[Session]:
     with SessionLocal() as session:
         yield session
+
+
+DbSession = Annotated[Session, Depends(get_db)]

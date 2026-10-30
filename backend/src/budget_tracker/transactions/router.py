@@ -1,10 +1,11 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Query, status
+from fastapi import APIRouter, Query, UploadFile, status
 
 from budget_tracker.core.database import DbSession
-from budget_tracker.transactions import service
+from budget_tracker.transactions import csv_import, service
 from budget_tracker.transactions.schemas import (
+    ImportResult,
     TransactionInput,
     TransactionPage,
     TransactionQuery,
@@ -30,6 +31,11 @@ def list_transactions(
 @router.post("", status_code=status.HTTP_201_CREATED)
 def create_transaction(data: TransactionInput, db: DbSession) -> TransactionRead:
     return TransactionRead.from_model(service.create_transaction(db, data))
+
+
+@router.post("/import")
+def import_transactions(file: UploadFile, db: DbSession) -> ImportResult:
+    return csv_import.import_transactions(db, file.file)
 
 
 @router.get("/{transaction_id}")

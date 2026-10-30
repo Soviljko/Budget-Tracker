@@ -4,7 +4,7 @@ from typing import Self
 
 from pydantic import BaseModel, Field, model_validator
 
-from budget_tracker.core.types import Amount, Description, from_cents
+from budget_tracker.core.types import Amount, CategoryName, Description, from_cents
 from budget_tracker.transactions.models import Transaction, TransactionType
 
 
@@ -57,3 +57,24 @@ class TransactionPage(BaseModel):
     total: int
     page: int
     page_size: int
+
+
+class CsvRow(BaseModel):
+    """One CSV row. Same rules as TransactionInput, but the category is given by name."""
+
+    type: TransactionType
+    amount: Amount
+    date: dt.date
+    description: Description = None
+    category: CategoryName
+
+
+class RowError(BaseModel):
+    row: int
+    errors: list[str]
+
+
+class ImportResult(BaseModel):
+    imported: int
+    failed: int
+    errors: list[RowError]

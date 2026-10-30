@@ -64,3 +64,24 @@ def test_summary_counts_only_transactions_from_that_month(
     summary = client.get("/summary/2026-10").json()
 
     assert summary["total_expense"] == "30.00"
+
+
+def test_balance_can_be_negative(client: TestClient, create_transaction) -> None:
+    create_transaction(type="income", amount="100.00")
+    create_transaction(type="expense", amount="150.50")
+
+    summary = client.get("/summary/2026-10").json()
+
+    assert summary["balance"] == "-50.50"
+
+
+def test_income_does_not_count_as_spent(
+    client: TestClient, create_category, create_transaction
+) -> None:
+    food = create_category(name="Food")
+    create_transaction(category_id=food["id"], type="expense", amount="30.00")
+    create_transaction(category_id=food["id"], type="income", amount="50.00")
+
+    summary = client.get("/summary/2026-10").json()
+
+    assert summary["categories"][0]["spent"] == "30.00"

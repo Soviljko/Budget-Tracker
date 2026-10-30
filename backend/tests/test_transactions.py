@@ -69,3 +69,23 @@ def test_create_transaction_rejects_unknown_category(client: TestClient) -> None
     response = client.post("/transactions", json=payload)
 
     assert response.status_code == 404
+
+
+@pytest.mark.parametrize(
+    ("field", "value"),
+    [
+        ("amount", "0.01"),  # smallest allowed amount
+        ("amount", "1000000.00"),  # largest allowed amount
+        ("description", "x" * 200),  # longest allowed description
+    ],
+)
+def test_create_transaction_accepts_boundary_values(
+    client: TestClient, create_category, field: str, value: str
+) -> None:
+    food = create_category(name="Food")
+    payload = {"type": "expense", "amount": "10", "date": "2026-10-08", "category_id": food["id"]}
+    payload[field] = value
+
+    response = client.post("/transactions", json=payload)
+
+    assert response.status_code == 201

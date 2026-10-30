@@ -20,9 +20,14 @@ class ConflictError(DomainError):
     """The request conflicts with existing data, e.g. a duplicate name."""
 
 
+class InvalidFileError(DomainError):
+    """An uploaded file cannot be read, e.g. a CSV with a wrong header."""
+
+
 _DOMAIN_ERROR_STATUS: dict[type[DomainError], tuple[int, str]] = {
     NotFoundError: (status.HTTP_404_NOT_FOUND, "not_found"),
     ConflictError: (status.HTTP_409_CONFLICT, "conflict"),
+    InvalidFileError: (status.HTTP_400_BAD_REQUEST, "invalid_file"),
 }
 
 

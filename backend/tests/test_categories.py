@@ -58,3 +58,31 @@ def test_category_with_transactions_cannot_be_deleted(
 
     assert response.status_code == 409
     assert client.get(f"/categories/{food['id']}").status_code == 200
+
+
+def test_create_category_accepts_name_of_30_characters(client: TestClient) -> None:
+    response = client.post("/categories", json={"name": "x" * 30, "color": "#000000"})
+
+    assert response.status_code == 201
+
+
+def test_rename_category_to_name_of_another_category_is_rejected(
+    client: TestClient, create_category
+) -> None:
+    create_category(name="Food")
+    rent = create_category(name="Rent")
+
+    response = client.patch(f"/categories/{rent['id']}", json={"name": "FOOD"})
+
+    assert response.status_code == 409
+
+
+def test_rename_category_to_its_own_name_in_another_case_is_allowed(
+    client: TestClient, create_category
+) -> None:
+    food = create_category(name="food")
+
+    response = client.patch(f"/categories/{food['id']}", json={"name": "Food"})
+
+    assert response.status_code == 200
+    assert response.json()["name"] == "Food"

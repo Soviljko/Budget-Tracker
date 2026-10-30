@@ -2,7 +2,6 @@
 name = "budget-tracker"
 version = "0.1.0"
 description = "REST API for a personal budget tracker"
-readme = "README.md"
 authors = [
     { name = "Ognjen Sovilj", email = "sovilj.ognjen12@gmail.com" }
 ]

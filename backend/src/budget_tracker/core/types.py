@@ -1,9 +1,13 @@
 from decimal import Decimal
 from typing import Annotated
 
+from annotated_types import Interval
 from pydantic import AfterValidator, Field, StringConstraints
 
 MAX_AMOUNT = Decimal("1000000.00")
+MAX_ID = 2**63 - 1  # the largest integer the database can store
+
+Id = Annotated[int, Interval(ge=1, le=MAX_ID)]
 
 Amount = Annotated[
     Decimal,
@@ -22,7 +26,7 @@ HexColor = Annotated[
 
 Month = Annotated[
     str,
-    StringConstraints(pattern=r"^\d{4}-(0[1-9]|1[0-2])$"),
+    StringConstraints(pattern=r"^[1-9]\d{3}-(0[1-9]|1[0-2])$"),
 ]
 
 

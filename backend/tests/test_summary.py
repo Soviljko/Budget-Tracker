@@ -85,3 +85,8 @@ def test_income_does_not_count_as_spent(
     summary = client.get("/summary/2026-10").json()
 
     assert summary["categories"][0]["spent"] == "30.00"
+
+
+def test_summary_rejects_invalid_month(client: TestClient) -> None:
+    assert client.get("/summary/2026-13").status_code == 422
+    assert client.get("/summary/0000-01").status_code == 422  # no year 0 in Python dates

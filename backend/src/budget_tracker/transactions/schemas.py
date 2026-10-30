@@ -4,7 +4,7 @@ from typing import Self
 
 from pydantic import BaseModel, Field, model_validator
 
-from budget_tracker.core.types import Amount, CategoryName, Description, from_cents
+from budget_tracker.core.types import MAX_ID, Amount, CategoryName, Description, Id, from_cents
 from budget_tracker.transactions.models import Transaction, TransactionType
 
 
@@ -13,7 +13,7 @@ class TransactionInput(BaseModel):
     amount: Amount
     date: dt.date
     description: Description = None
-    category_id: int
+    category_id: Id
 
 
 class TransactionRead(BaseModel):
@@ -39,10 +39,10 @@ class TransactionRead(BaseModel):
 class TransactionQuery(BaseModel):
     date_from: dt.date | None = None
     date_to: dt.date | None = None
-    category_id: int | None = None
+    category_id: Id | None = None
     type: TransactionType | None = None
     search: str | None = None
-    page: int = Field(default=1, ge=1)
+    page: int = Field(default=1, ge=1, le=MAX_ID // 100)
     page_size: int = Field(default=20, ge=1, le=100)
 
     @model_validator(mode="after")

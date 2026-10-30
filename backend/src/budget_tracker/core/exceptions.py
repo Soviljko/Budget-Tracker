@@ -1,6 +1,7 @@
 from fastapi import FastAPI, Request, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
+from pydantic import BaseModel
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 
@@ -22,6 +23,26 @@ class ConflictError(DomainError):
 
 class InvalidFileError(DomainError):
     """An uploaded file cannot be read, e.g. a CSV with a wrong header."""
+
+
+class ErrorDetail(BaseModel):
+    field: str
+    message: str
+
+
+class ErrorBody(BaseModel):
+    code: str
+    message: str
+    details: list[ErrorDetail]
+
+
+class ErrorResponse(BaseModel):
+    error: ErrorBody
+
+
+def error_responses(*status_codes: int) -> dict[int | str, dict[str, type[ErrorResponse]]]:
+    """Tell the API docs that these status codes use our error format."""
+    return {code: {"model": ErrorResponse} for code in status_codes}
 
 
 _DOMAIN_ERROR_STATUS: dict[type[DomainError], tuple[int, str]] = {

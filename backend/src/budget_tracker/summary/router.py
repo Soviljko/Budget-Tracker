@@ -1,11 +1,12 @@
 from fastapi import APIRouter
 
 from budget_tracker.core.database import DbSession
+from budget_tracker.core.exceptions import error_responses
 from budget_tracker.core.types import Month
 from budget_tracker.summary import service
 from budget_tracker.summary.schemas import MonthlySummary
 
-router = APIRouter(prefix="/summary", tags=["summary"])
+router = APIRouter(prefix="/summary", tags=["summary"], responses=error_responses(422))
 
 
 @router.get("/{month}")
